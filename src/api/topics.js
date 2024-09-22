@@ -298,3 +298,34 @@ topicsAPI.bump = async (caller, { tid }) => {
 	await topics.markAsUnreadForAll(tid);
 	topics.pushUnreadCount(caller.uid);
 };
+
+topicsAPI.save = async function (caller, data) {
+	if (!caller.uid) {
+		throw new Error('[[error:not-logged-in]]');
+	}
+	if (!data.tid) {
+		throw new Error('[[error:invalid-tid]]');
+	}
+	const exists = await topics.exists(data.tid);
+	if (!exists) {
+		throw new Error('[[error:no-topic]]');
+	}
+	await topics.saveTopicForUser(data.tid, caller.uid);
+};
+
+topicsAPI.unsave = async function (caller, data) {
+	if (!caller.uid) {
+		throw new Error('[[error:not-logged-in]]');
+	}
+	if (!data.tid) {
+		throw new Error('[[error:invalid-tid]]');
+	}
+	await topics.unsaveTopicForUser(data.tid, caller.uid);
+};
+
+topicsAPI.getSaved = async function (caller, data) {
+	if (!caller.uid) {
+		throw new Error('[[error:not-logged-in]]');
+	}
+	await topics.getSavedTopics(caller.uid, data.page);
+};
