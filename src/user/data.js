@@ -25,7 +25,7 @@ module.exports = function (User) {
 		'aboutme', 'signature', 'uploadedpicture', 'profileviews', 'reputation',
 		'postcount', 'topiccount', 'lastposttime', 'banned', 'banned:expire',
 		'status', 'flags', 'followerCount', 'followingCount', 'cover:url',
-		'cover:position', 'groupTitle', 'mutedUntil', 'mutedReason',
+		'cover:position', 'groupTitle', 'mutedUntil', 'mutedReason', 'saved'
 	];
 
 	User.guestData = {
@@ -366,5 +366,25 @@ module.exports = function (User) {
 		const newValue = await db.incrObjectFieldBy(`user:${uid}`, field, value);
 		plugins.hooks.fire('action:user.set', { uid: uid, field: field, value: newValue, type: type });
 		return newValue;
+	}
+	
+	User.addSaved = async function (uid, value) {
+        const cleanValue = validator.escape(value ? value.toString() : '');
+        let currentValues = await db.getObjectField(`user:${uid}`, field);
+        if (!currentValues) {
+            currentValues = [];
+        } else if (typeof currentValues === 'string') {
+            try {
+                currentValues = JSON.parse(currentValues);
+            } catch (err) {
+                currentValues = [currentValues];
+            }
+        }
+        if (!Array.isArray(currentValues)) {
+            currentValues = [currentValues];
+        }
+        currentValues.push(cleanValue);
+        await db.setObjectField(`user:${uid}`, field, JSON.stringify(currentValues));
+        plugins.hooks.fire('action:user.set', { uid, field, value: cleanValue, type: 'append' });
 	}
 };
