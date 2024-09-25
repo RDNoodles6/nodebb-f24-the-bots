@@ -1,6 +1,5 @@
 'use strict';
 
-
 const nconf = require('nconf');
 const qs = require('querystring');
 const validator = require('validator');
