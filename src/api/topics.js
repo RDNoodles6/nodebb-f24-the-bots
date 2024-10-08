@@ -298,3 +298,16 @@ topicsAPI.bump = async (caller, { tid }) => {
 	await topics.markAsUnreadForAll(tid);
 	topics.pushUnreadCount(caller.uid);
 };
+
+topicsAPI.sortTopics = async function (caller, { topics }) {
+	if (!topics || !Array.isArray(topics)) {
+		throw new Error('[[error:invalid-topics-array]]');
+	}
+	topics.sort((a, b) => {
+		const aSolved = a.solved === "true";
+		const bSolved = b.solved === "true";
+		if (aSolved !== bSolved) {
+			return aSolved ? 1 : -1;
+		}
+		return b.lastposttime - a.lastposttime;
+	});
