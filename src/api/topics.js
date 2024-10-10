@@ -303,11 +303,11 @@ topicsAPI.sortTopics = async function (caller, { topics }) {
 	if (!topics || !Array.isArray(topics)) {
 		throw new Error('[[error:invalid-topics-array]]');
 	}
-	topics.sort((a, b) => {
-		const aSolved = a.solved === "true";
-		const bSolved = b.solved === "true";
+	topics.sort((t1, t2) => {
+		const aSolved = t1.solved === "true";
+		const bSolved = t2.solved === "true";
 		if (aSolved !== bSolved) {
 			return aSolved ? 1 : -1;
 		}
-		return b.lastposttime - a.lastposttime;
+		return t2.lastposttime - t1.lastposttime;
 	});
